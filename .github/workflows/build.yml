@@ -19,13 +19,6 @@ jobs:
         with:
           flutter-version: '3.24.0'
           channel: 'stable'
-      - name: 🔧 Auto-Repair Project Structure
-        run: |
-          # Cette étape répare automatiquement le projet s'il manque des fichiers
-          flutter create . --platforms=android
-          mkdir -p assets
-          touch assets/.gitkeep
-      - name: 📦 Get dependencies
         run: flutter pub get
       - name: 🏗️ Build APK
         run: flutter build apk --release --no-tree-shake-icons
