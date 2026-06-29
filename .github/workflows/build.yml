@@ -19,6 +19,7 @@ jobs:
         with:
           flutter-version: '3.24.0'
           channel: 'stable'
+      - name: 📦 Get dependencies
         run: flutter pub get
       - name: 🏗️ Build APK
         run: flutter build apk --release --no-tree-shake-icons
