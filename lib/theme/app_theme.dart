@@ -46,7 +46,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
