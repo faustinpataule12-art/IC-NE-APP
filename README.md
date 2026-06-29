@@ -62,3 +62,4 @@ lib/
 ---
 
 *Propulsé par Flutter • Build automatique via GitHub Actions*
+ 
