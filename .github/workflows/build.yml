@@ -17,10 +17,18 @@ jobs:
       - name: 🐦 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
           channel: 'stable'
       - name: 📦 Get dependencies
         run: flutter pub get
+      - name: 🔧 Patch win32 compatibility (Dart 3.x)
+        run: |
+          WIN32_GUID="$HOME/.pub-cache/hosted/pub.dev/win32-$(cat pubspec.lock | grep -A2 'win32:' | grep version | head -1 | grep -oP '[0-9]+\.[0-9]+\.[0-9]+')/lib/src/guid.dart"
+          if [ -f "$WIN32_GUID" ]; then
+            sed -i 's/UnmodifiableUint8ListView/Uint8List/g' "$WIN32_GUID"
+            echo "✅ Patched win32 guid.dart"
+          else
+            echo "ℹ️ win32 guid.dart not found, skipping patch"
+          fi
       - name: 🏗️ Build APK
         run: flutter build apk --release --no-tree-shake-icons
       - name: 🚀 Create Release
