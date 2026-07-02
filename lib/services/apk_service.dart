@@ -248,44 +248,45 @@ class ApkService {
   }
 
   Future<String> _signApk(String unsignedPath, Directory workDir) async {
-    // Generate a debug keystore for signing
-    final keystorePath = '${workDir.path}/debug.keystore';
     final signedPath = '${workDir.path}/output_signed.apk';
 
-    // Generate keystore using keytool
-    final keytoolResult = await Process.run('keytool', [
-      '-genkey', '-v',
-      '-keystore', keystorePath,
-      '-alias', 'nps_key',
-      '-keyalg', 'RSA',
-      '-keysize', '2048',
-      '-validity', '10000',
-      '-storepass', 'nps123456',
-      '-keypass', 'nps123456',
-      '-dname', 'CN=NPS.NELSON, OU=NPS, O=NPS Studio, L=Kinshasa, S=DRC, C=CD',
-    ]);
+    try {
+      final keystorePath = '${workDir.path}/debug.keystore';
 
-    if (keytoolResult.exitCode != 0) {
-      // If keytool not available, just copy (unsigned APK still works for testing)
-      await File(unsignedPath).copy(signedPath);
-      return signedPath;
-    }
+      final keytoolResult = await Process.run('keytool', [
+        '-genkey', '-v',
+        '-keystore', keystorePath,
+        '-alias', 'nps_key',
+        '-keyalg', 'RSA',
+        '-keysize', '2048',
+        '-validity', '10000',
+        '-storepass', 'nps123456',
+        '-keypass', 'nps123456',
+        '-dname', 'CN=NPS.NELSON, OU=NPS, O=NPS Studio, L=Kinshasa, S=DRC, C=CD',
+      ]);
 
-    // Sign with jarsigner
-    final signResult = await Process.run('jarsigner', [
-      '-verbose',
-      '-sigalg', 'SHA256withRSA',
-      '-digestalg', 'SHA-256',
-      '-keystore', keystorePath,
-      '-storepass', 'nps123456',
-      '-keypass', 'nps123456',
-      '-signedjar', signedPath,
-      unsignedPath,
-      'nps_key',
-    ]);
+      if (keytoolResult.exitCode != 0) {
+        await File(unsignedPath).copy(signedPath);
+        return signedPath;
+      }
 
-    if (signResult.exitCode != 0) {
-      // Fallback: copy unsigned
+      final signResult = await Process.run('jarsigner', [
+        '-verbose',
+        '-sigalg', 'SHA256withRSA',
+        '-digestalg', 'SHA-256',
+        '-keystore', keystorePath,
+        '-storepass', 'nps123456',
+        '-keypass', 'nps123456',
+        '-signedjar', signedPath,
+        unsignedPath,
+        'nps_key',
+      ]);
+
+      if (signResult.exitCode != 0) {
+        await File(unsignedPath).copy(signedPath);
+      }
+    } catch (e) {
+      // keytool/jarsigner indisponibles sur Android : on repart sur l'APK non signé
       await File(unsignedPath).copy(signedPath);
     }
 
