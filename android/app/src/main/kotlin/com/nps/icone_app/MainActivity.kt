@@ -41,9 +41,15 @@ class MainActivity : FlutterActivity() {
                         Handler(Looper.getMainLooper()).post {
                             result.success(outputPath)
                         }
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
+                        val details = StringBuilder()
+                        var t: Throwable? = e
+                        while (t != null) {
+                            details.append(t.javaClass.name).append(": ").append(t.message).append(" | ")
+                            t = t.cause
+                        }
                         Handler(Looper.getMainLooper()).post {
-                            result.error("SIGN_FAILED", e.message, null)
+                            result.error("SIGN_FAILED", details.toString(), null)
                         }
                     }
                 }.start()
