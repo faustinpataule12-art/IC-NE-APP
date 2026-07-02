@@ -102,9 +102,10 @@ class MainActivity : FlutterActivity() {
         val apkSigner = ApkSigner.Builder(listOf(signerConfig))
             .setInputApk(File(inputPath))
             .setOutputApk(File(outputPath))
-            .setV1SigningEnabled(true)
+            .setV1SigningEnabled(false)
             .setV2SigningEnabled(true)
             .setV3SigningEnabled(true)
+            .setMinSdkVersion(24)
             .build()
 
         apkSigner.sign()
